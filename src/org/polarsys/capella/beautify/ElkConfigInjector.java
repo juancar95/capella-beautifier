@@ -89,7 +89,15 @@ public class ElkConfigInjector extends SessionManagerListener.Stub {
      * Creates a full ELK Layered configuration matching CapellaLayoutPatch options.
      * Default direction is RIGHT (horizontal). BeautifyDiagramHandler changes it per click.
      */
+    public static CustomLayoutConfiguration createFlatElkConfig() {
+        return createElkConfig(false);
+    }
+
     public static CustomLayoutConfiguration createFullElkConfig() {
+        return createElkConfig(true);
+    }
+
+    private static CustomLayoutConfiguration createElkConfig(boolean includeChildren) {
         CustomLayoutConfiguration c = DescriptionFactory.eINSTANCE.createCustomLayoutConfiguration();
         c.setId(ELK_ALGORITHM_ID);
         c.setLabel(BEAUTIFY_LABEL);
@@ -106,9 +114,11 @@ public class ElkConfigInjector extends SessionManagerListener.Stub {
         // Node placement: Brandes-Koepf (compact, good for Capella)
         addEnumOption(c, "org.eclipse.elk.layered.nodePlacement.strategy", "BRANDES_KOEPF", LayoutOptionTarget.PARENT);
 
-        // Hierarchy handling: layout inside containers too
-        addEnumOption(c, "org.eclipse.elk.hierarchyHandling", "INCLUDE_CHILDREN",
-                LayoutOptionTarget.NODE, LayoutOptionTarget.PARENT);
+        // Hierarchy handling: layout inside containers too (can crash on complex hierarchical edges)
+        if (includeChildren) {
+            addEnumOption(c, "org.eclipse.elk.hierarchyHandling", "INCLUDE_CHILDREN",
+                    LayoutOptionTarget.NODE, LayoutOptionTarget.PARENT);
+        }
 
         // Crossing minimization: thorough
         addEnumOption(c, "org.eclipse.elk.layered.crossingMinimization.strategy", "LAYER_SWEEP", LayoutOptionTarget.PARENT);
