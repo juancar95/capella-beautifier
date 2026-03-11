@@ -22,9 +22,9 @@ One-click diagram beautifier for [Capella MBSE](https://mbse-capella.org/). Auto
 
 ### Recommended: Full Package (plugin + ELK)
 
-1. Download **`capella-beautifier-v1.0.0-full.zip`** from [Releases](https://github.com/juancar95/capella-beautifier/releases)
+1. Download **`capella-beautifier-v1.0.1-full.zip`** from [Releases](https://github.com/juancar95/capella-beautifier/releases)
 2. Unzip the package
-3. Copy `capella-beautify-1.0.0.jar` to your Capella **dropins** folder:
+3. Copy `capella-beautify-1.0.1.jar` to your Capella **dropins** folder:
    - macOS: `/Applications/Capella.app/Contents/Eclipse/dropins/`
    - Windows: `C:\Program Files\Capella\eclipse\dropins\`
 4. Copy **all JARs** from the `plugins/` folder to your Capella **plugins** folder:
@@ -37,7 +37,7 @@ One-click diagram beautifier for [Capella MBSE](https://mbse-capella.org/). Auto
 
 If ELK is already installed in your Capella:
 
-1. Download `capella-beautify-1.0.0.jar` from [Releases](https://github.com/juancar95/capella-beautifier/releases)
+1. Download `capella-beautify-1.0.1.jar` from [Releases](https://github.com/juancar95/capella-beautifier/releases)
 2. Copy it to `<Capella>/dropins/`
 3. Restart Capella
 
@@ -58,14 +58,14 @@ If they're missing, use the **Full Package** above.
 
 ```bash
 ./scripts/build-macos.sh
-# Output: dist/capella-beautify-1.0.0.jar
+# Output: dist/capella-beautify-1.0.1.jar
 ```
 
 ### Windows
 
 ```batch
 scripts\build-windows.bat
-REM Output: dist\capella-beautify-1.0.0.jar
+REM Output: dist\capella-beautify-1.0.1.jar
 ```
 
 Requires Capella 7.0.1 installed (the build uses its plugin JARs as compile dependencies).

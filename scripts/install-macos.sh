@@ -28,7 +28,7 @@ if [ ! -d "$CAPELLA_DIR" ]; then
 fi
 
 # Check beautify JAR exists
-if [ ! -f "$PROJECT_DIR/dist/capella-beautify-1.0.0.jar" ]; then
+if [ ! -f "$PROJECT_DIR/dist/capella-beautify-1.0.1.jar" ]; then
     echo "ERROR: Plugin JAR not found. Run scripts/build-macos.sh first."
     exit 1
 fi
@@ -39,7 +39,7 @@ cp "$BUNDLES_INFO" "$CAPELLA_DIR/backup/bundles.info.bak" 2>/dev/null || true
 echo "   Done."
 
 echo "[2/6] Installing Beautify plugin to dropins/..."
-cp "$PROJECT_DIR/dist/capella-beautify-1.0.0.jar" "$DROPINS_DIR/"
+cp "$PROJECT_DIR/dist/capella-beautify-1.0.1.jar" "$DROPINS_DIR/"
 echo "   Done."
 
 echo "[3/6] Copying ELK JARs..."
