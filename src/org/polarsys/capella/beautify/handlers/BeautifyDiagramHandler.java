@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2025-2026 Juan Carlos López Calvo.
- * Based on Eclipse Capella (EPL 2.0).
+ * Plugin for Eclipse Capella.
  */
 package org.polarsys.capella.beautify.handlers;
 
