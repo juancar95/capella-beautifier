@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Capella Beautify Diagram
+Bundle-SymbolicName: org.polarsys.capella.core.sirius.analysis.beautify;singleton:=true
+Bundle-Version: 1.0.0
+Require-Bundle: org.polarsys.capella.core.sirius.analysis;bundle-version="7.0.1",
+ org.eclipse.core.commands,
+ org.eclipse.core.runtime,
+ org.eclipse.ui.workbench,
+ org.eclipse.sirius.diagram.model,
+ org.eclipse.sirius.diagram.ui,
+ org.eclipse.gmf.runtime.diagram.ui,
+ org.eclipse.gmf.runtime.notation,
+ org.eclipse.gef,
+ org.eclipse.emf.ecore,
+ org.eclipse.swt,
+ org.eclipse.jface,
+ org.apache.log4j,
+ org.eclipse.gmf.runtime.diagram.ui.actions,
+ org.eclipse.emf.transaction,
+ org.eclipse.sirius
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-ActivationPolicy: lazy

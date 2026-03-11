@@ -1,0 +1,21 @@
+# Build output
+build/
+dist/
+*.class
+
+# Eclipse project files
+.project
+.classpath
+.settings/
+
+# Local ELK classes (bundled for development)
+org/eclipse/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.iml
+.vscode/

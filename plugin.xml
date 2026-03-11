@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension point="org.eclipse.ui.commands">
+      <category
+            id="org.polarsys.capella.core.sirius.analysis.beautify.category"
+            name="Beautify Category">
+      </category>
+      <command
+            categoryId="org.polarsys.capella.core.sirius.analysis.beautify.category"
+            id="org.polarsys.capella.core.sirius.analysis.beautifyDiagram"
+            name="Beautify Diagram">
+         <commandParameter
+               id="org.polarsys.capella.core.sirius.analysis.beautifyDiagram.direction"
+               name="direction"
+               optional="true"/>
+      </command>
+   </extension>
+
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            class="org.polarsys.capella.beautify.handlers.BeautifyDiagramHandler"
+            commandId="org.polarsys.capella.core.sirius.analysis.beautifyDiagram">
+      </handler>
+   </extension>
+
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution locationURI="toolbar:org.eclipse.sirius.diagram.ui.tabbar?after=additions">
+         <command
+               commandId="org.polarsys.capella.core.sirius.analysis.beautifyDiagram"
+               label="Beautify H"
+               tooltip="Arrange horizontal (left to right)"
+               style="push">
+            <parameter
+                  name="org.polarsys.capella.core.sirius.analysis.beautifyDiagram.direction"
+                  value="horizontal"/>
+         </command>
+         <command
+               commandId="org.polarsys.capella.core.sirius.analysis.beautifyDiagram"
+               label="Beautify V"
+               tooltip="Arrange vertical (top to bottom)"
+               style="push">
+            <parameter
+                  name="org.polarsys.capella.core.sirius.analysis.beautifyDiagram.direction"
+                  value="vertical"/>
+         </command>
+      </menuContribution>
+   </extension>
+
+   <extension point="org.eclipse.sirius.sessionManagerListener">
+      <listener class="org.polarsys.capella.beautify.ElkConfigInjector"/>
+   </extension>
+</plugin>
