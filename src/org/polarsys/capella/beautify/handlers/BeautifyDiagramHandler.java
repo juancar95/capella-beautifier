@@ -85,9 +85,12 @@ public class BeautifyDiagramHandler extends AbstractHandler {
         TransactionalEditingDomain domain = TransactionUtil.getEditingDomain(desc);
         if (domain == null) return null;
 
-        // Always create fresh ELK config with correct direction
+        // 1. Set ELK config (inside RecordingCommand for proper undo)
         CustomLayoutConfiguration elkConfig = ElkConfigInjector.createFullElkConfig();
         setDirectionOnConfig(elkConfig, elkDir);
+
+        // Save original layout so we can restore it after arrange (config is transient, not user-visible)
+        final Layout originalLayout = desc.getLayout();
 
         try {
             domain.getCommandStack().execute(new RecordingCommand(domain, "Beautify: set ELK") {
@@ -98,34 +101,37 @@ public class BeautifyDiagramHandler extends AbstractHandler {
             return null;
         }
 
+        // 2. Arrange (creates its own undo entry via performRequest)
+        ArrangeRequest req = new ArrangeRequest("arrangeAllAction");
+        dep.performRequest(req);
+
+        // 3. Post-processing inside a RecordingCommand (so Ctrl+Z undoes it consistently)
+        final DiagramEditPart finalDep = dep;
+        final DDiagram finalDDiagram = dDiagram;
+        List<GraphicalEditPart> toRefresh = new ArrayList<>();
         try {
-            @SuppressWarnings("unchecked")
-            List<?> rawChildren = dep.getChildren();
-            List<EditPart> parts = new ArrayList<>();
-            if (rawChildren != null) {
-                for (Object child : rawChildren) {
-                    if (child instanceof EditPart) parts.add((EditPart) child);
+            domain.getCommandStack().execute(new RecordingCommand(domain, "Beautify: post-process") {
+                @Override protected void doExecute() {
+                    // Restore original layout config (the arrange already used the ELK config)
+                    desc.setLayout(originalLayout);
+                    // Refresh styles
+                    refreshSpecificStyles(finalDDiagram);
+                    // Normalize node sizes
+                    collectNodeSizeChanges(finalDep, toRefresh);
                 }
-            }
-
-            ArrangeRequest req = new ArrangeRequest("arrangeAllAction");
-            req.setPartsToArrange(parts);
-            dep.performRequest(req);
-
-            refreshSpecificStyles(dDiagram);
-            normalizeZeroSizedNodes(dep);
-            dep.refresh();
-            LOGGER.info("Beautify: done (" + desc.getName() + ", " + elkDir + ", " + parts.size() + " parts)");
+            });
         } catch (Throwable t) {
-            LOGGER.error("Beautify: arrange failed", t);
+            LOGGER.error("Beautify: post-process failed", t);
         }
+
+        // UI refresh (not an EMF change, doesn't need to be in transaction)
+        for (GraphicalEditPart gep : toRefresh) gep.refresh();
+        dep.refresh();
+        LOGGER.info("Beautify: done (" + desc.getName() + ", " + elkDir + ")");
 
         return null;
     }
 
-    /**
-     * Updates the elk.direction option on an existing CustomLayoutConfiguration.
-     */
     private void setDirectionOnConfig(CustomLayoutConfiguration config, String direction) {
         for (LayoutOption opt : config.getLayoutOptions()) {
             if (opt instanceof EnumLayoutOption && ELK_DIRECTION_ID.equals(opt.getId())) {
@@ -174,10 +180,13 @@ public class BeautifyDiagramHandler extends AbstractHandler {
     private static final int CHAR_WIDTH_ESTIMATE = 7;  // approx pixels per character
     private static final int LABEL_H_PADDING = 30;     // horizontal padding around label text
 
-    private void normalizeZeroSizedNodes(DiagramEditPart editPart) {
+    /**
+     * Applies node size corrections inside a transaction. Modified edit parts are added to toRefresh
+     * for UI refresh after the transaction commits.
+     */
+    private void collectNodeSizeChanges(DiagramEditPart editPart, List<GraphicalEditPart> toRefresh) {
         Deque<EditPart> queue = new ArrayDeque<>();
         queue.add(editPart);
-        List<GraphicalEditPart> modified = new ArrayList<>();
         while (!queue.isEmpty()) {
             EditPart current = queue.removeFirst();
             for (Object child : current.getChildren())
@@ -192,7 +201,6 @@ public class BeautifyDiagramHandler extends AbstractHandler {
                 int w = ShapeUtil.getNodeWidth(node);
                 int h = ShapeUtil.getNodeHeight(node);
 
-                // Calculate minimum width based on label text
                 int requiredWidth = MIN_NODE_WIDTH;
                 EObject element = node.getElement();
                 if (element instanceof DDiagramElement) {
@@ -206,10 +214,9 @@ public class BeautifyDiagramHandler extends AbstractHandler {
                 boolean changed = false;
                 if (w < requiredWidth) { ShapeUtil.setNodeWidth(node, requiredWidth); changed = true; }
                 if (h < MIN_NODE_HEIGHT) { ShapeUtil.setNodeHeight(node, MIN_NODE_HEIGHT); changed = true; }
-                if (changed) modified.add(gep);
+                if (changed) toRefresh.add(gep);
             } catch (RuntimeException e) { /* skip */ }
         }
-        for (GraphicalEditPart gep : modified) gep.refresh();
     }
 
     private boolean isResizableNode(GraphicalEditPart ep, Node node) {
