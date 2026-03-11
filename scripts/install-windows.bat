@@ -40,7 +40,7 @@ if not exist "%CAPELLA_DIR%" (
 )
 
 REM Check beautify JAR exists
-if not exist "%PROJECT_DIR%\dist\capella-beautify-1.0.0.jar" (
+if not exist "%PROJECT_DIR%\dist\capella-beautify-1.0.1.jar" (
     echo ERROR: Plugin JAR not found. Run scripts\build-windows.bat first.
     exit /b 1
 )
@@ -52,7 +52,7 @@ echo    Done.
 
 echo [2/6] Installing Beautify plugin to dropins\...
 if not exist "%DROPINS_DIR%" mkdir "%DROPINS_DIR%"
-copy "%PROJECT_DIR%\dist\capella-beautify-1.0.0.jar" "%DROPINS_DIR%\" >nul
+copy "%PROJECT_DIR%\dist\capella-beautify-1.0.1.jar" "%DROPINS_DIR%\" >nul
 echo    Done.
 
 echo [3/6] Copying ELK JARs...

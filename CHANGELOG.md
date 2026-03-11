@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.1] - 2026-03-11
+
+### Fixed
+- Ctrl+Z undo corrupting ports and edges on Windows — post-processing now runs inside a RecordingCommand
+
+### Added
+- Fallback layout without INCLUDE_CHILDREN for complex PABs with hierarchical edge crashes
+
+### Changed
+- ELK config is now transient — original layout config is restored after arrange
+
 ## [1.0.0] - 2026-03-11
 
 ### Added
