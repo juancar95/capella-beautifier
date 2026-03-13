@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Capella Beautify Diagram
 Bundle-SymbolicName: org.polarsys.capella.core.sirius.analysis.beautify;singleton:=true
-Bundle-Version: 1.0.1
+Bundle-Version: 1.0.2
 Require-Bundle: org.polarsys.capella.core.sirius.analysis;bundle-version="7.0.1",
  org.eclipse.core.commands,
  org.eclipse.core.runtime,

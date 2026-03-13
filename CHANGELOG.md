@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.2] - 2026-03-13
+
+### Fixed
+- ELK INCLUDE_CHILDREN crashing on Windows (NPE in LayerSweepCrossingMinimizer) — removed semiInteractive and feedbackEdges options that triggered the bug
+- Physical Ports being resized by post-processing — removed manual node size enforcement, ELK handles sizing natively
+
+### Removed
+- Manual node size post-processing (collectNodeSizeChanges) — was interfering with port sizes and causing scrollbar issues
+
 ## [1.0.1] - 2026-03-11
 
 ### Fixed

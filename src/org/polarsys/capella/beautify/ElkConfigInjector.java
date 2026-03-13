@@ -120,12 +120,8 @@ public class ElkConfigInjector extends SessionManagerListener.Stub {
                     LayoutOptionTarget.NODE, LayoutOptionTarget.PARENT);
         }
 
-        // Crossing minimization: thorough
+        // Crossing minimization: layer sweep (without semiInteractive — causes NPE with INCLUDE_CHILDREN on Windows)
         addEnumOption(c, "org.eclipse.elk.layered.crossingMinimization.strategy", "LAYER_SWEEP", LayoutOptionTarget.PARENT);
-        addBooleanOption(c, "org.eclipse.elk.layered.crossingMinimization.semiInteractive", true, LayoutOptionTarget.PARENT);
-
-        // Feedback edges: true (handles cycles gracefully)
-        addBooleanOption(c, "org.eclipse.elk.layered.feedbackEdges", true, LayoutOptionTarget.PARENT);
 
         // Node size: ensure nodes are big enough for their labels
         addEnumSetOption(c, "org.eclipse.elk.nodeSize.constraints",

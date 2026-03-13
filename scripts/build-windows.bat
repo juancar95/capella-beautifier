@@ -81,13 +81,13 @@ if errorlevel 1 (
 )
 
 echo Packaging JAR...
-jar cfm dist\capella-beautify-1.0.1.jar META-INF\MANIFEST.MF ^
+jar cfm dist\capella-beautify-1.0.2.jar META-INF\MANIFEST.MF ^
     -C build org ^
     -C . plugin.xml ^
     -C . icons
 
 echo.
-echo Built: dist\capella-beautify-1.0.1.jar
+echo Built: dist\capella-beautify-1.0.2.jar
 echo.
 echo Install: copy to ^<Capella^>\dropins\
 
