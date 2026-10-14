@@ -13,7 +13,7 @@ One-click diagram beautifier for [Capella MBSE](https://mbse-capella.org/). Auto
 
 ## Requirements
 
-- **Capella 7.0.1**
+- **Capella 7.0.0 or 7.0.1**
 - **ELK bundles** installed in Capella (included in the full installation package)
 
 > **Important:** The plugin requires ELK (Eclipse Layout Kernel) to work. Without ELK, the buttons will appear but the layout will not work correctly. Use the **Full Installation** package below.
@@ -22,9 +22,11 @@ One-click diagram beautifier for [Capella MBSE](https://mbse-capella.org/). Auto
 
 ### Recommended: Full Package (plugin + ELK)
 
-1. Download **`capella-beautifier-v1.0.2-full.zip`** from [Releases](https://github.com/juancar95/capella-beautifier/releases)
+1. Download the full package matching your Capella version from [Releases](https://github.com/juancar95/capella-beautifier/releases/tag/v1.0.3):
+   - **Capella 7.0.0:** `capella-beautifier-v1.0.3-capella-7.0.0-full.zip`
+   - **Capella 7.0.1:** `capella-beautifier-v1.0.3-capella-7.0.1-full.zip`
 2. Unzip the package
-3. Copy `capella-beautify-1.0.2.jar` to your Capella **dropins** folder:
+3. Remove older `capella-beautify-*.jar` files from **dropins**, then copy `capella-beautify-1.0.3.jar` there:
    - macOS: `/Applications/Capella.app/Contents/Eclipse/dropins/`
    - Windows: `C:\Program Files\Capella\eclipse\dropins\`
 4. Copy **all JARs** from the `plugins/` folder to your Capella **plugins** folder:
@@ -33,12 +35,14 @@ One-click diagram beautifier for [Capella MBSE](https://mbse-capella.org/). Auto
 5. Restart Capella (first launch may need `-clean` flag)
 6. macOS only: `sudo xattr -cr /Applications/Capella.app` (if blocked by Gatekeeper)
 
+Both packages contain the same plugin and ELK 0.9.0. The Sirius/ELK adapter matches the target Capella version: Sirius 7.4.1 for Capella 7.0.0, and Sirius 7.4.5 for Capella 7.0.1. Use the matching package; the 7.0.1 adapter cannot load in Capella 7.0.0.
+
 ### Quick Install (if you already have ELK)
 
 If ELK is already installed in your Capella:
 
-1. Download `capella-beautify-1.0.2.jar` from [Releases](https://github.com/juancar95/capella-beautifier/releases)
-2. Copy it to `<Capella>/dropins/`
+1. Download `capella-beautify-1.0.3.jar` from [Releases](https://github.com/juancar95/capella-beautifier/releases/tag/v1.0.3)
+2. Remove older `capella-beautify-*.jar` files from `<Capella>/dropins/`, then copy the new JAR there
 3. Restart Capella
 
 ### Verify ELK is installed
@@ -58,17 +62,17 @@ If they're missing, use the **Full Package** above.
 
 ```bash
 ./scripts/build-macos.sh
-# Output: dist/capella-beautify-1.0.2.jar
+# Output: dist/capella-beautify-1.0.3.jar
 ```
 
 ### Windows
 
 ```batch
 scripts\build-windows.bat
-REM Output: dist\capella-beautify-1.0.2.jar
+REM Output: dist\capella-beautify-1.0.3.jar
 ```
 
-Requires Capella 7.0.1 installed (the build uses its plugin JARs as compile dependencies).
+Requires Capella 7.0.0 or 7.0.1 installed (the build uses its plugin JARs as compile dependencies). Set `CAPELLA_HOME` to the installation's Eclipse directory when using a non-default path.
 
 ## ELK Configuration
 

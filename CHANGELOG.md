@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.3] - 2026-10-14
+
+### Fixed
+- Capella 7.0.0 could not load the plugin because the manifest required Capella 7.0.1 or newer. The dependency range is now `[7.0.0,7.1.0)`.
+- Updated build scripts and JAR names for v1.0.3. The layout implementation is unchanged.
+
+### Added
+- Isolated OSGi bundle resolution and Java linkage check for compatibility verification.
+- Separate full packages for Capella 7.0.0 (Sirius/ELK adapter 7.4.1) and 7.0.1 (adapter 7.4.5), containing the same plugin and ELK 0.9.0. The 7.0.1 package retains the v1.0.2 dependency JARs.
+
+### Verification
+- Unchanged Java sources compile against both versions, producing identical class bytes.
+- The plugin, full-package dependencies, configuration factory and handler linkage pass isolated OSGi checks on both versions. The published v1.0.2 plugin fails resolution on 7.0.0 as expected.
+- The maintainer manually confirmed Beautify H and Beautify V work on both Capella 7.0.0 and 7.0.1 on macOS. Windows and Linux interactive tests were not performed for this release.
+
 ## [1.0.2] - 2026-03-13
 
 ### Fixed

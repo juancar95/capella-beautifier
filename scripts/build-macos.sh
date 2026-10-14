@@ -1,6 +1,6 @@
 #!/bin/bash
 # Build script for Capella Beautify Plugin
-# Compiles against Capella 7.0.1 plugin JARs and packages as an OSGi bundle JAR
+# Compiles against Capella 7.0.0 or 7.0.1 plugin JARs and packages as an OSGi bundle JAR
 
 set -e
 
@@ -72,12 +72,12 @@ javac -source 17 -target 17 \
     src/org/polarsys/capella/beautify/handlers/BeautifyDiagramHandler.java
 
 echo "Packaging JAR..."
-jar cfm dist/capella-beautify-1.0.2.jar META-INF/MANIFEST.MF \
+jar cfm dist/capella-beautify-1.0.3.jar META-INF/MANIFEST.MF \
     -C build/ org/ \
     -C . plugin.xml \
     -C . icons/
 
 echo ""
-echo "Built: dist/capella-beautify-1.0.2.jar"
+echo "Built: dist/capella-beautify-1.0.3.jar"
 echo ""
 echo "Install: copy to <Capella>/dropins/"
