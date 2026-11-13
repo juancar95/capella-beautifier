@@ -1,55 +1,94 @@
 #!/usr/bin/env python3
-"""Package one tested JAR with the dependency sets for Capella 7.0.0 and 7.0.1."""
+"""Package one JAR with checksum-pinned dependencies for each supported Capella."""
 
 import argparse
+import hashlib
+import json
 from pathlib import Path
-from zipfile import ZIP_DEFLATED, ZipFile
+from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
+
+PROJECT = Path(__file__).resolve().parent.parent
+DEPENDENCIES = json.loads((PROJECT / 'scripts/release-dependencies.json').read_text())
+ZIP_DATE = (2026, 1, 1, 0, 0, 0)
+
+
+def validate_dependencies(version, directory):
+    actual = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in sorted(directory.glob('*.jar'))}
+    if actual != DEPENDENCIES[version]:
+        missing = set(DEPENDENCIES[version]) - set(actual)
+        extra = set(actual) - set(DEPENDENCIES[version])
+        changed = {name for name in actual.keys() & DEPENDENCIES[version].keys()
+                   if actual[name] != DEPENDENCIES[version][name]}
+        raise ValueError(f'Capella {version}: missing={sorted(missing)}, '
+                         f'extra={sorted(extra)}, changed={sorted(changed)}')
+    return [directory / name for name in actual]
+
+
+def write_entry(archive, name, data):
+    info = ZipInfo(name, ZIP_DATE)
+    info.compress_type = ZIP_DEFLATED
+    info.external_attr = 0o100644 << 16
+    archive.writestr(info, data)
+
+
+def package(version, capella, plugin, dependencies, output):
+    root = f'capella-beautifier-v{version}-capella-{capella}-full'
+    with ZipFile(output, 'w') as archive:
+        for jar in [plugin, *dependencies]:
+            write_entry(archive, f'{root}/dropins/capella-beautifier/eclipse/plugins/{jar.name}',
+                        jar.read_bytes())
+        for name in ['LICENSE', 'THIRD_PARTY_LICENSES.md']:
+            write_entry(archive, f'{root}/{name}', (PROJECT / name).read_bytes())
+        instructions = (
+            f'Capella Beautifier {version} for Capella {capella}\n\n'
+            'Close Capella. Remove older Beautifier JARs from BOTH dropins and plugins\n'
+            '(also check nested folders). Remove any older capella-beautifier drop-in\n'
+            'folder. Keep a backup outside the Capella installation if needed.\n\n'
+            'Copy this package\'s capella-beautifier folder into your Capella dropins\n'
+            'folder, preserving the eclipse/plugins subfolders. Restart Capella.\n'
+            'Use -clean before -vmargs on the first launch if necessary.\n\n'
+            'Do not copy these dependencies over the native plugins folder, or use\n'
+            'a full package intended for a different Capella version.\n'
+        )
+        write_entry(archive, f'{root}/INSTALL.txt', instructions.encode())
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("capella_700_plugins", type=Path)
-    parser.add_argument("capella_701_plugins", type=Path)
+    for version in DEPENDENCIES:
+        parser.add_argument('capella_' + version.replace('.', '') + '_plugins', type=Path)
     args = parser.parse_args()
-    project = Path(__file__).resolve().parent.parent
-    headers = dict(
-        line.split(": ", 1)
-        for line in (project / "META-INF/MANIFEST.MF").read_text().splitlines()
-        if ": " in line
-    )
-    version = headers["Bundle-Version"]
-    plugin = project / "dist" / f"capella-beautify-{version}.jar"
+    headers = dict(line.split(': ', 1)
+                   for line in (PROJECT / 'META-INF/MANIFEST.MF').read_text().splitlines()
+                   if ': ' in line)
+    version = headers['Bundle-Version']
+    plugin = PROJECT / 'dist' / f'capella-beautify-{version}.jar'
     if not plugin.is_file():
-        parser.error(f"Build the plugin first: {plugin}")
+        parser.error(f'Build the plugin first: {plugin}')
     with ZipFile(plugin) as jar:
-        manifest = jar.read("META-INF/MANIFEST.MF").decode().replace("\r\n", "\n").replace("\n ", "")
-        if f"Bundle-Version: {version}\n" not in manifest:
-            parser.error("The built JAR version does not match the source manifest")
-    packages = [
-        ("7.0.0", "7.4.1.202405151520", args.capella_700_plugins),
-        ("7.0.1", "7.4.5.202411261603", args.capella_701_plugins),
-    ]
-    dependencies = []
-    for capella, sirius, directory in packages:
-        jars = sorted(directory.glob("*.jar"))
-        bridges = sorted(directory.glob("org.eclipse.sirius.diagram.elk_*.jar"))
-        expected = directory / f"org.eclipse.sirius.diagram.elk_{sirius}.jar"
-        if len(jars) != 10 or bridges != [expected]:
-            parser.error(f"Expected ten dependency JARs and Sirius {sirius} for Capella {capella}")
-        dependencies.append({jar.name: jar.read_bytes() for jar in jars if jar not in bridges})
-    if dependencies[0] != dependencies[1]:
-        parser.error("The dependency sets must differ only in the Sirius/ELK adapter")
-    for capella, _, directory in packages:
-        name = f"capella-beautifier-v{version}-capella-{capella}-full"
-        output = project / "dist" / f"{name}.zip"
-        with ZipFile(output, "w", compression=ZIP_DEFLATED) as archive:
-            archive.write(plugin, f"{name}/{plugin.name}")
-            for jar in sorted(directory.glob("*.jar")):
-                archive.write(jar, f"{name}/plugins/{jar.name}")
-            for license_file in ["LICENSE", "THIRD_PARTY_LICENSES.md"]:
-                archive.write(project / license_file, f"{name}/{license_file}")
+        manifest = jar.read('META-INF/MANIFEST.MF').decode().replace('\r\n', '\n').replace('\n ', '')
+        source_manifest = (PROJECT / 'META-INF/MANIFEST.MF').read_text()
+        for line in source_manifest.splitlines():
+            if line.startswith(('Bundle-Version:', 'Require-Bundle:')) and line not in manifest:
+                parser.error('The built JAR manifest does not match the source')
+    # Validate every set before writing any output.
+    try:
+        sets = {v: validate_dependencies(v, getattr(args, 'capella_' + v.replace('.', '') + '_plugins'))
+                for v in DEPENDENCIES}
+    except ValueError as error:
+        parser.error(str(error))
+    outputs = [plugin]
+    for capella, dependencies in sets.items():
+        output = PROJECT / 'dist' / f'capella-beautifier-v{version}-capella-{capella}-full.zip'
+        package(version, capella, plugin, dependencies, output)
+        outputs.append(output)
         print(output)
+    checksums = PROJECT / 'dist' / f'capella-beautifier-v{version}-SHA256SUMS.txt'
+    checksums.write_text(''.join(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}\n'
+                                 for p in outputs))
+    print(checksums)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

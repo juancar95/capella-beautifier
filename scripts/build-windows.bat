@@ -1,6 +1,6 @@
 @echo off
 REM Build script for Capella Beautify Plugin (Windows)
-REM Compiles against Capella 7.0.0 or 7.0.1 plugin JARs and packages as a JAR
+REM Compiles against Capella 7.0.0, 7.0.1 or 7.1.0 plugin JARs and packages as a JAR
 
 setlocal enabledelayedexpansion
 
@@ -35,6 +35,11 @@ for %%p in (
     "org.eclipse.gmf.runtime.diagram.core_*.jar"
     "org.eclipse.gmf.runtime.notation_*.jar"
     "org.eclipse.gmf.runtime.common.core_*.jar"
+    "org.eclipse.gmf.runtime.emf.commands.core_*.jar"
+    "org.eclipse.emf.workspace_*.jar"
+    "org.eclipse.core.resources_*.jar"
+    "org.eclipse.core.jobs_*.jar"
+    "org.eclipse.emf.ecore.change_*.jar"
     "org.eclipse.gef_*.jar"
     "org.eclipse.swt_*.jar"
     "org.eclipse.swt.win32.win32.x86_64_*.jar"
@@ -64,12 +69,14 @@ for %%p in (
     )
 )
 
+for /f "tokens=2" %%v in ('findstr /b "Bundle-Version:" META-INF\MANIFEST.MF') do set "VERSION=%%v"
+
 echo Compiling...
 if exist build rmdir /s /q build
 mkdir build
 if not exist dist mkdir dist
 
-javac -source 17 -target 17 ^
+javac --release 17 ^
     -cp "%CP%" ^
     -d build ^
     src\org\polarsys\capella\beautify\ElkConfigInjector.java ^
@@ -81,13 +88,16 @@ if errorlevel 1 (
 )
 
 echo Packaging JAR...
-jar cfm dist\capella-beautify-1.0.3.jar META-INF\MANIFEST.MF ^
+jar --create --file "dist\capella-beautify-%VERSION%.jar" --manifest META-INF\MANIFEST.MF ^
+    --date=2026-01-01T00:00:00Z ^
     -C build org ^
     -C . plugin.xml ^
     -C . icons
 
+if errorlevel 1 exit /b 1
+
 echo.
-echo Built: dist\capella-beautify-1.0.3.jar
+echo Built: dist\capella-beautify-%VERSION%.jar
 echo.
 echo Install: copy to ^<Capella^>\dropins\
 

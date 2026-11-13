@@ -1,8 +1,8 @@
 #!/bin/bash
 # Build script for Capella Beautify Plugin
-# Compiles against Capella 7.0.0 or 7.0.1 plugin JARs and packages as an OSGi bundle JAR
+# Compiles against Capella 7.0.0, 7.0.1 or 7.1.0 plugin JARs and packages as an OSGi bundle JAR
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -30,6 +30,11 @@ for pattern in \
     "org.eclipse.gmf.runtime.diagram.core_*.jar" \
     "org.eclipse.gmf.runtime.notation_*.jar" \
     "org.eclipse.gmf.runtime.common.core_*.jar" \
+    "org.eclipse.gmf.runtime.emf.commands.core_*.jar" \
+    "org.eclipse.emf.workspace_*.jar" \
+    "org.eclipse.core.resources_*.jar" \
+    "org.eclipse.core.jobs_*.jar" \
+    "org.eclipse.emf.ecore.change_*.jar" \
     "org.eclipse.gef_*.jar" \
     "org.eclipse.swt_*.jar" \
     "org.eclipse.swt.cocoa.macosx.aarch64_*.jar" \
@@ -50,7 +55,7 @@ for pattern in \
     "org.eclipse.sirius.common_*.jar" \
     "org.eclipse.emf.edit_*.jar"
 do
-    found=$(ls $CAPELLA_PLUGINS/$pattern 2>/dev/null | head -1)
+    found=$(find "$CAPELLA_PLUGINS" -maxdepth 1 -name "$pattern" -print -quit)
     if [ -n "$found" ]; then
         CP="$CP:$found"
     else
@@ -61,23 +66,26 @@ done
 # Remove leading colon
 CP="${CP:1}"
 
+VERSION="$(awk '/^Bundle-Version:/ {print $2}' META-INF/MANIFEST.MF)"
+
 echo "Compiling..."
 rm -rf build/
 mkdir -p build/ dist/
 
-javac -source 17 -target 17 \
+javac --release 17 \
     -cp "$CP" \
     -d build/ \
     src/org/polarsys/capella/beautify/ElkConfigInjector.java \
     src/org/polarsys/capella/beautify/handlers/BeautifyDiagramHandler.java
 
 echo "Packaging JAR..."
-jar cfm dist/capella-beautify-1.0.3.jar META-INF/MANIFEST.MF \
+jar --create --file "dist/capella-beautify-$VERSION.jar" --manifest META-INF/MANIFEST.MF \
+    --date=2026-01-01T00:00:00Z \
     -C build/ org/ \
     -C . plugin.xml \
     -C . icons/
 
 echo ""
-echo "Built: dist/capella-beautify-1.0.3.jar"
+echo "Built: dist/capella-beautify-$VERSION.jar"
 echo ""
 echo "Install: copy to <Capella>/dropins/"

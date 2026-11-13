@@ -19,3 +19,6 @@ Thumbs.db
 .idea/
 *.iml
 .vscode/
+
+# Python test cache
+__pycache__/

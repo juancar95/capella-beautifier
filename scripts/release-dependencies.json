@@ -1,0 +1,41 @@
+{
+  "7.0.0": {
+    "com.google.inject_6.0.0.jar": "b4d4f7ec5e8fc17b4f98dee9d3f6cf6ae3ae13e2e5ed4b2f7bbf09bc4bb675d5",
+    "jakarta.inject.jakarta.inject-api_2.0.1.jar": "f7dc98062fccf14126abb751b64fab12c312566e8cbdc8483598bffcea93af7c",
+    "org.aopalliance_1.0.0.v20220404-1927.jar": "32bdd829becadaf3f8afaab2566fccdd1a0d88867993dbafd229def6d44954bb",
+    "org.eclipse.elk.alg.common_0.9.0.jar": "bf9e633f71d159a71796b6ddc6a9ba4e65e4906cc2e888b600725322295bff16",
+    "org.eclipse.elk.alg.layered_0.9.0.jar": "80a17922d7e5fa9c112ec8ab16a235e825c1f903e05642812f1beae333611299",
+    "org.eclipse.elk.alg.rectpacking_0.9.0.jar": "54e1543ecd24d89a31171d3da5f8640b879da1a16d330db5325489f5865a5f34",
+    "org.eclipse.elk.core.service_0.9.0.jar": "65a25cb8dd3c543fd04205b0a332b18a7cdb15f20ea6048adb5d7cb1706e2976",
+    "org.eclipse.elk.core_0.9.0.jar": "c988ccb69105b241139d4b7bf5c964b85e8bea9e34cd074be8ea6769b86faf50",
+    "org.eclipse.elk.graph_0.9.0.jar": "7e7fc922ecac7805801baf6438d2932ad5584dfd9db77fac2dd1e1b0b3675c9d",
+    "org.eclipse.sirius.diagram.elk_7.4.1.202405151520.jar": "939c5d1322b3c841473e9d76a7b7acfd9985cdc26db813f3c8721fd84d48d8de",
+    "org.eclipse.xtext.xbase.lib_2.30.0.v20230227-1111.jar": "00725f902a8f6b3b2c8e2387e16ac8903f85181bdb1380cabb11acb93abb1033"
+  },
+  "7.0.1": {
+    "com.google.inject_6.0.0.jar": "b4d4f7ec5e8fc17b4f98dee9d3f6cf6ae3ae13e2e5ed4b2f7bbf09bc4bb675d5",
+    "jakarta.inject.jakarta.inject-api_2.0.1.jar": "f7dc98062fccf14126abb751b64fab12c312566e8cbdc8483598bffcea93af7c",
+    "org.aopalliance_1.0.0.v20220404-1927.jar": "32bdd829becadaf3f8afaab2566fccdd1a0d88867993dbafd229def6d44954bb",
+    "org.eclipse.elk.alg.common_0.9.0.jar": "bf9e633f71d159a71796b6ddc6a9ba4e65e4906cc2e888b600725322295bff16",
+    "org.eclipse.elk.alg.layered_0.9.0.jar": "80a17922d7e5fa9c112ec8ab16a235e825c1f903e05642812f1beae333611299",
+    "org.eclipse.elk.alg.rectpacking_0.9.0.jar": "54e1543ecd24d89a31171d3da5f8640b879da1a16d330db5325489f5865a5f34",
+    "org.eclipse.elk.core.service_0.9.0.jar": "65a25cb8dd3c543fd04205b0a332b18a7cdb15f20ea6048adb5d7cb1706e2976",
+    "org.eclipse.elk.core_0.9.0.jar": "c988ccb69105b241139d4b7bf5c964b85e8bea9e34cd074be8ea6769b86faf50",
+    "org.eclipse.elk.graph_0.9.0.jar": "7e7fc922ecac7805801baf6438d2932ad5584dfd9db77fac2dd1e1b0b3675c9d",
+    "org.eclipse.sirius.diagram.elk_7.4.5.202411261603.jar": "ed675d1749572b172a4ff4567de6d150911dd51a3c101a316e5ff00cafe8860f",
+    "org.eclipse.xtext.xbase.lib_2.30.0.v20230227-1111.jar": "00725f902a8f6b3b2c8e2387e16ac8903f85181bdb1380cabb11acb93abb1033"
+  },
+  "7.1.0": {
+    "com.google.inject_7.0.0.jar": "de5b0e359bd7b03ca42806b368846efd95484380fe05ae2a4ea71bc338c59c00",
+    "jakarta.inject.jakarta.inject-api_2.0.1.jar": "f7dc98062fccf14126abb751b64fab12c312566e8cbdc8483598bffcea93af7c",
+    "org.aopalliance_1.0.0.v20230720-0728.jar": "168be5617dbc3db07f8b2befcc97c74cff4c7556861267e0f32f4d9b6388ff7d",
+    "org.eclipse.elk.alg.common_0.9.0.jar": "bf9e633f71d159a71796b6ddc6a9ba4e65e4906cc2e888b600725322295bff16",
+    "org.eclipse.elk.alg.layered_0.9.0.jar": "80a17922d7e5fa9c112ec8ab16a235e825c1f903e05642812f1beae333611299",
+    "org.eclipse.elk.alg.rectpacking_0.9.0.jar": "54e1543ecd24d89a31171d3da5f8640b879da1a16d330db5325489f5865a5f34",
+    "org.eclipse.elk.core.service_0.9.0.jar": "65a25cb8dd3c543fd04205b0a332b18a7cdb15f20ea6048adb5d7cb1706e2976",
+    "org.eclipse.elk.core_0.9.0.jar": "c988ccb69105b241139d4b7bf5c964b85e8bea9e34cd074be8ea6769b86faf50",
+    "org.eclipse.elk.graph_0.9.0.jar": "7e7fc922ecac7805801baf6438d2932ad5584dfd9db77fac2dd1e1b0b3675c9d",
+    "org.eclipse.sirius.diagram.elk_7.4.14.202512030914.jar": "4bbf657453bf2495af38940389a377add275105df6fa8412fd87978e9d571fca",
+    "org.eclipse.xtext.xbase.lib_2.34.0.v20240227-0940.jar": "bf2d99a1643e36a572670fb2d489742106d76c02dd17d2d159bd730cff8de2b7"
+  }
+}
