@@ -5,6 +5,7 @@
 package org.polarsys.capella.beautify.handlers;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,13 +13,22 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.emf.transaction.RecordingCommand;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.transaction.util.TransactionUtil;
+import org.eclipse.gef.EditPart;
+import org.eclipse.gef.commands.Command;
+import org.eclipse.gmf.runtime.common.core.command.CommandResult;
+import org.eclipse.gmf.runtime.common.core.command.ICommand;
+import org.eclipse.gmf.runtime.diagram.ui.commands.ICommandProxy;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart;
+import org.eclipse.gmf.runtime.diagram.ui.parts.DiagramCommandStack;
 import org.eclipse.gmf.runtime.diagram.ui.parts.DiagramEditor;
 import org.eclipse.gmf.runtime.diagram.ui.requests.ArrangeRequest;
 import org.eclipse.gmf.runtime.notation.Diagram;
+import org.eclipse.gmf.runtime.emf.commands.core.command.AbstractTransactionalCommand;
 import org.eclipse.sirius.diagram.DDiagram;
 import org.eclipse.sirius.diagram.description.CustomLayoutConfiguration;
 import org.eclipse.sirius.diagram.description.DescriptionFactory;
@@ -27,7 +37,6 @@ import org.eclipse.sirius.diagram.description.EnumLayoutOption;
 import org.eclipse.sirius.diagram.description.EnumLayoutValue;
 import org.eclipse.sirius.diagram.description.Layout;
 import org.eclipse.sirius.diagram.description.LayoutOption;
-import org.eclipse.sirius.diagram.description.LayoutOptionTarget;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -74,44 +83,69 @@ public class BeautifyDiagramHandler extends AbstractHandler {
         TransactionalEditingDomain domain = TransactionUtil.getEditingDomain(desc);
         if (domain == null) return null;
 
-        // 1. Set ELK config (with INCLUDE_CHILDREN for hierarchical layout)
         CustomLayoutConfiguration elkConfig = ElkConfigInjector.createFullElkConfig();
         setDirectionOnConfig(elkConfig, elkDir);
+        String label = ELK_RIGHT.equals(elkDir) ? "Beautify Horizontal" : "Beautify Vertical";
 
-        // Save original layout so we can restore it after arrange
-        final Layout originalLayout = desc.getLayout();
-
-        try {
-            domain.getCommandStack().execute(new RecordingCommand(domain, "Beautify: set ELK") {
-                @Override protected void doExecute() { desc.setLayout(elkConfig); }
-            });
-        } catch (Throwable t) {
-            LOGGER.error("Beautify: failed to set ELK config", t);
-            return null;
-        }
-
-        // 2. Arrange
-        ArrangeRequest req = new ArrangeRequest("arrangeAllAction");
-        dep.performRequest(req);
-
-        // 3. Post-processing inside a RecordingCommand (so Ctrl+Z undoes it consistently)
-        final DDiagram finalDDiagram = dDiagram;
-        try {
-            domain.getCommandStack().execute(new RecordingCommand(domain, "Beautify: post-process") {
-                @Override protected void doExecute() {
+        // One diagram operation owns configuration, arrangement and styles. Executing
+        // the arrange command directly inside it avoids separate undo-history entries.
+        AbstractTransactionalCommand beautify = new AbstractTransactionalCommand(
+                domain, label, Collections.emptyList()) {
+            @Override
+            protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info)
+                    throws ExecutionException {
+                Layout originalLayout = desc.getLayout();
+                try {
+                    desc.setLayout(elkConfig);
+                    IStatus status;
+                    try {
+                        status = arrange(dep, monitor, info);
+                    } catch (NullPointerException error) {
+                        if (!isHierarchicalImportFailure(error)) throw error;
+                        // ELK 0.9.0 can reject cross-hierarchy/deployment edges before
+                        // producing geometry. Retry with each container laid out separately.
+                        LOGGER.warn("Beautify: ELK hierarchical import failed; retrying per container");
+                        CustomLayoutConfiguration flat = ElkConfigInjector.createFlatElkConfig();
+                        setDirectionOnConfig(flat, elkDir);
+                        desc.setLayout(flat);
+                        status = arrange(dep, monitor, info);
+                    }
+                    if (!status.isOK()) {
+                        return new CommandResult(status);
+                    }
+                    refreshSpecificStyles(dDiagram);
+                    LOGGER.info("Beautify: done (" + desc.getName() + ", " + elkDir + ")");
+                    return CommandResult.newOKCommandResult();
+                } finally {
                     desc.setLayout(originalLayout);
-                    refreshSpecificStyles(finalDDiagram);
                 }
-            });
-        } catch (Throwable t) {
-            LOGGER.error("Beautify: post-process failed", t);
-        }
+            }
+        };
+        dep.getDiagramEditDomain().getDiagramCommandStack().execute(new ICommandProxy(beautify));
 
         // UI refresh
         dep.refresh();
-        LOGGER.info("Beautify: done (" + desc.getName() + ", " + elkDir + ")");
-
         return null;
+    }
+
+    private IStatus arrange(DiagramEditPart diagram, IProgressMonitor monitor, IAdaptable info)
+            throws ExecutionException {
+        ArrangeRequest request = new ArrangeRequest("arrangeAllAction");
+        EditPart target = diagram.getTargetEditPart(request);
+        Command command = target == null ? null : target.getCommand(request);
+        ICommand arrange = command == null ? null : DiagramCommandStack.getICommand(command);
+        if (arrange == null || !arrange.canExecute()) {
+            throw new ExecutionException("No executable layout command for this diagram.");
+        }
+        return arrange.execute(monitor, info);
+    }
+
+    private boolean isHierarchicalImportFailure(NullPointerException error) {
+        for (StackTraceElement frame : error.getStackTrace()) {
+            if ("org.eclipse.elk.alg.layered.graph.transform.ElkGraphImporter".equals(frame.getClassName())
+                    && "transformEdge".equals(frame.getMethodName())) return true;
+        }
+        return false;
     }
 
     private void setDirectionOnConfig(CustomLayoutConfiguration config, String direction) {
