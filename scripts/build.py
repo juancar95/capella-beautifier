@@ -2,7 +2,6 @@
 """Build the same Java 17 plugin on each platform using the target Capella APIs."""
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -20,7 +19,7 @@ def main():
     native = 'win32.win32.*' if os.name == 'nt' else 'cocoa.macosx.*' if sys.platform == 'darwin' else 'gtk.linux.*'
     classpath = []
     for pattern in [*PATTERNS, f'org.eclipse.swt.{native}_*.jar']:
-        matches = sorted(plugins.glob(pattern))
+        matches = sorted(p for p in plugins.glob(pattern) if '.source_' not in p.name)
         if len(matches) != 1:
             raise SystemExit(f'Expected one match for {pattern}, found {len(matches)} in {plugins}')
         classpath.append(matches[0].resolve().as_posix())
