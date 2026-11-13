@@ -62,6 +62,7 @@ def adapt_xbase(data):
                     lines.append(line)
                 payload = ('\r\n'.join(lines) + '\r\n\r\n').encode()
             info = ZipInfo(name, (2026, 1, 1, 0, 0, 0))
+            info.create_system = 3
             info.compress_type = ZIP_DEFLATED
             info.external_attr = 0o100644 << 16
             target.writestr(info, payload)

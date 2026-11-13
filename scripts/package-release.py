@@ -27,6 +27,7 @@ def validate_dependencies(version, directory):
 
 def write_entry(archive, name, data):
     info = ZipInfo(name, ZIP_DATE)
+    info.create_system = 3
     info.compress_type = ZIP_DEFLATED
     info.external_attr = 0o100644 << 16
     archive.writestr(info, data)

@@ -62,9 +62,9 @@ for %%p in (
 ) do (
     for %%f in ("%CAPELLA_PLUGINS%\%%~p") do (
         if "!CP!"=="" (
-            set "CP=%%f"
+            set "CP=%%~ff"
         ) else (
-            set "CP=!CP!;%%f"
+            set "CP=!CP!;%%~ff"
         )
     )
 )
