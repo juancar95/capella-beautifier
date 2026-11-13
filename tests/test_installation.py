@@ -55,6 +55,7 @@ class InstallationTest(unittest.TestCase):
         (self.project / 'META-INF/MANIFEST.MF').write_text('Bundle-Version: 1.0.4\n')
         self.script = self.project / 'scripts/install-macos.sh'
         shutil.copy2(ROOT / 'scripts/install-macos.sh', self.script)
+        shutil.copy2(ROOT / 'scripts/install-windows.ps1', self.project / 'scripts/install-windows.ps1')
         self.capella = self.root / 'Capella Eclipse'
         for n in ['plugins', 'dropins/other/eclipse/plugins', 'configuration']:
             (self.capella / n).mkdir(parents=True)
@@ -70,7 +71,8 @@ class InstallationTest(unittest.TestCase):
             archive.writestr(f'{root}/dropins/capella-beautifier/eclipse/plugins/engine.jar', b'engine')
 
     def run_installer(self):
-        return subprocess.run(['bash', str(self.script)], env={**os.environ, 'CAPELLA_HOME': str(self.capella)}, capture_output=True, text=True)
+        command = ['powershell.exe', '-NoProfile', '-File', str(self.project / 'scripts/install-windows.ps1')] if os.name == 'nt' else ['bash', str(self.script)]
+        return subprocess.run(command, env={**os.environ, 'CAPELLA_HOME': str(self.capella)}, capture_output=True, text=True)
 
     def test_backs_up_all_old_copies_and_keeps_native_files(self):
         result = self.run_installer()
