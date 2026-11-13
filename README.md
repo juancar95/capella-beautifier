@@ -74,7 +74,7 @@ scripts\build-windows.bat
 REM Output: dist\capella-beautify-1.0.4.jar
 ```
 
-Requires Capella 7.0.0, 7.0.1 or 7.1.0 installed (the build uses its plugin JARs as compile dependencies). Set `CAPELLA_HOME` to the installation's Eclipse directory when using a non-default path.
+Requires a JDK 17 or newer, Python 3, and Capella 7.0.0, 7.0.1 or 7.1.0 installed (the build uses its plugin JARs as compile dependencies). Set `CAPELLA_HOME` to the installation's Eclipse directory when using a non-default path.
 
 ## ELK Configuration
 
