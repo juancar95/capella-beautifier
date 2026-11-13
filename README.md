@@ -122,7 +122,7 @@ This plugin was inspired by and builds upon ideas from:
 - [MBSE-Capella Forum: Effectively beautifying diagrams](https://forum.mbse-capella.org/t/effectively-beatifying-diagrams-with-automatic-functions-how/6516) — community discussion on diagram layout approaches
 - [Obeo Blog: A picture is worth a thousand words](https://blog.obeosoft.com/a-picture-is-worth-a-thousand-words) — Sirius/ELK integration concepts
 
-This plugin takes a different architectural approach (programmatic injection via `SessionManagerListener` + `RecordingCommand` instead of permanent `.odesign` modification) and does not share code with any of the above projects.
+This plugin takes a different architectural approach (programmatic injection via `SessionManagerListener` and a transactional diagram command instead of permanent `.odesign` modification) and does not share code with any of the above projects.
 
 ## Author
 
