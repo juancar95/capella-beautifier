@@ -1,6 +1,8 @@
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import org.eclipse.elk.core.RecursiveGraphLayoutEngine;
+import org.eclipse.elk.core.data.LayoutMetaDataService;
+import org.eclipse.elk.alg.layered.options.LayeredMetaDataProvider;
 import org.eclipse.elk.core.options.CoreOptions;
 import org.eclipse.elk.core.options.Direction;
 import org.eclipse.elk.core.options.EdgeRouting;
@@ -20,6 +22,9 @@ public final class ElkLayoutCheck {
     }
 
     public static void main(String[] args) {
+        // Register explicitly: this isolated framework has no Eclipse application registry.
+        LayoutMetaDataService.getInstance().registerLayoutMetaDataProviders(
+                new CoreOptions(), new LayeredMetaDataProvider());
         if (Guice.createInjector().getInstance(Consumer.class).dependency == null) {
             throw new AssertionError("Guice injection failed");
         }

@@ -20,7 +20,7 @@ public final class BundleCompatibilityCheck {
     private static final String BEAUTIFIER = "org.polarsys.capella.core.sirius.analysis.beautify";
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 5) {
+        if (args.length != 5 && args.length != 6) {
             throw new IllegalArgumentException(
                 "Usage: BundleCompatibilityCheck <Capella plugins> <extra plugins> <plugin.jar> <storage> <resolved|unresolved>");
         }
@@ -82,6 +82,15 @@ public final class BundleCompatibilityCheck {
             handler.getDeclaredMethods();
             handler.getConstructor().newInstance();
             System.out.println("Beautify handler linkage and construction: PASS");
+            if (args.length == 6) {
+                Bundle test = framework.getBundleContext().installBundle(Path.of(args[5]).toUri().toString());
+                if (!wiring.resolveBundles(List.of(test))) {
+                    printRequirements(test);
+                    throw new AssertionError("ELK runtime test bundle did not resolve");
+                }
+                test.loadClass("ElkLayoutCheck").getMethod("main", String[].class)
+                    .invoke(null, (Object) new String[0]);
+            }
         } finally {
             framework.stop();
             framework.waitForStop(10000);
